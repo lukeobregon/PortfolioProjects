@@ -82,21 +82,7 @@ where r.raceID between 1051 and 1073
 order by raceId, position
 
 
---Lap Times
-select Driver, Lap, Position, convert(varchar,dateadd(ms,Laptime,0),114) as LapTime, convert(varchar,dateadd(ms,racetime,0),114) as RaceTime,(RaceTime-FastLap)/1000 as Delta
-from(
-	select *,
-	min(RaceTime) over(partition by lap order by lap, position) as FastLap
-	from(
-		select d.surname as Driver, l.lap, l.position, l.milliseconds as Laptime, 
-		sum(l.milliseconds) over(partition by d.surname order by l.lap) as RaceTime
-		from lap_times as l
-		join drivers as d
-		on l.driverId = d.driverId
-		where raceID=1051) x
-	) t
-
---edit: this should query all Races for 2021 (RaceID 1052-1073)
+--Lap Times for 2021 Season
 select Raceid, Date, Race, Driver, Lap, Position, convert(varchar,dateadd(ms,Laptime,0),114) as LapTime, 
 convert(varchar,dateadd(ms,racetime,0),114) as RaceTime, (RaceTime-FastLap)/1000 as Delta
 from(
@@ -112,11 +98,10 @@ from(
 			on l.driverId = d.driverId
 			join races as r
 			on l.raceId = r.raceId
-			where r.raceID between 1051 and 1073) x
+			where r.year = '2021') x
 			) t
 	)s
 order by Date, lap, position
-
 
 
 --Full Race Summary 
